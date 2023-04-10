@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { UserContext } from "../UserContext";
 
 export default function LoginPage(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);   //for redirection
+    const {setUserInfo} = useContext(UserContext);
 
     //login function that fetches sure credentials
     async function login(ev){
@@ -14,11 +16,14 @@ export default function LoginPage(){
             body: JSON.stringify({username, password}),
             headers: {'Content-Type':'application/json'},
             credentials: 'include',
-        });
+        })
 
         //if response == user account credentials, make setRedirect() = true
         if(response.ok){
-            setRedirect(true);
+            response.json().then(userInfo => {
+                setUserInfo(userInfo);
+                setRedirect(true);
+            });     
         } else{
             alert ('Mismatched Credentials!');
         }
