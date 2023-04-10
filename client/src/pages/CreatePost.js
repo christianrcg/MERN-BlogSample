@@ -40,6 +40,7 @@ export default function CreatePost(){
         const response = await fetch ('http://localhost:4000/post', {
             method: 'POST',
             body: data,  
+            credentials: 'include',
         });
         if(response.ok){
             setRedirect(true);
@@ -49,7 +50,7 @@ export default function CreatePost(){
     if (redirect){
         return <Navigate to={'/'} />
     }
-    
+
     return(
         <form onSubmit={createNewPost}>
             <input type="title" 

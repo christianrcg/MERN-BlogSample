@@ -1,16 +1,18 @@
-export default function Post(){
+import {formatISO9075} from "date-fns";
+
+export default function Post({title,summary,cover,content,createdAt,author}){
     return(
         <div className="post">
         <div className="image">
-          <img src="https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/iphone-14-pro-model-unselect-gallery-2-202209?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1660753617559" alt="" />
+          <img src={'http://localhost:4000/'+cover} alt="" />
         </div>
         <div className="texts">
-          <h2> Iphone 14 pro max</h2>
+          <h2> {title} </h2>
           <p className="info">
-            <a href="" className="author">Steve Jobs</a>
-            <time>2023-04-06 14:20</time>
+            <a href="" className="author">{author.username}</a>
+            <time>{formatISO9075(new Date(createdAt))}</time>
           </p>
-          <p className="summary">iPhone 14 Pro and 14 Pro Max. With Dynamic Island. Crash Detection. An innovative 48MP camera. And A16 Bionic.</p>
+          <p className="summary">{summary}</p>
         </div>
       </div>
     );

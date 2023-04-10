@@ -21,6 +21,7 @@ const secret = 'Naegamandeunkuki';
 app.use(cors({credentials:true, origin:'http://localhost:3000'}));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 //connect to mongodb
 mongoose.connect('mongodb+srv://iblog:NeiCmE4zcQH48Ayf@cluster0.mdggqin.mongodb.net/?retryWrites=true&w=majority');
@@ -78,17 +79,29 @@ app.post('/post', uploadMiddleware.single('file'), async (req,res) =>{
     const newPath = path+'.'+ext;
     fs.renameSync(path, newPath);
 
-    const {title,summary,content} = req.body;
-    const postDoc = await Post.create({
-        title,
-        summary,
-        content,
-        cover:newPath,
-    });
-
-    res.json(postDoc);
+    const {token} = req.cookies;
+    jwt.verify(token, secret, {}, async (err,info) => {
+        if(err) throw err;
+        const {title,summary,content} = req.body;
+        const postDoc = await Post.create({
+            title,
+            summary,
+            content,
+            cover:newPath,
+            author:info.id, 
+        });
+        res.json(postDoc);
+    });    
 });
 
+app.get('/post', async (req,res) => {
+    res.json(
+        await Post.find()
+        .populate('author', ['username'])
+        .sort({createdAt: -1})
+        .limit(20)
+    );
+});
 
 
 //sets the app to listen to 4000 server
