@@ -6,7 +6,7 @@ export default function Header(){
         <Link to="/" className="logo">iBlog</Link>
         <nav>
           <Link to="/login">Login</Link>
-          <Link to="/Register">Register</Link> 
+          <Link to="/register">Register</Link> 
         </nav>
       </header>
     );

@@ -4,6 +4,7 @@ export default function Registerpage(){
     const[username, setUsername] = useState('');
     const[password, setPassword] = useState('');
 
+    // registration function, uses fetch to the listened server
     async function register(ev){
         ev.preventDefault();
         const response = await fetch('http://localhost:4000/register', {
@@ -11,13 +12,16 @@ export default function Registerpage(){
             body: JSON.stringify({username,password}),
             headers: {'Content-Type':'application/json'},
         });
-        if(response.status === 200){
+
+         //checks if the registration is valid, it will cause an error if a same username is inputted to db (will return 400), if successful otherwise will return 200
+        if(response.status === 200){           
             alert('Registration Successful');
         } else{
             alert('Registration Failed');
         } 
     }
 
+    //register page body that will uses event tag (ev)
     return(
         <form className="register" onSubmit={register}>
             <h1>Register</h1>
