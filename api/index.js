@@ -2,10 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./models/User');
+const Post = require('./models/Post');
 const bcrypt = require('bcryptjs');
 const app = express();
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const multer = require ('multer');
+const uploadMiddleware = multer({ dest: 'uploads/' });
+const fs = require('fs');
 
 
 //hashing password
@@ -67,6 +71,26 @@ app.post('/logout', (req,res) => {
     res.cookie('token', '').json('ok');
 });
 
+app.post('/post', uploadMiddleware.single('file'), async (req,res) =>{
+    const {originalname,path} = req.file;
+    const parts = originalname.split('.');
+    const ext = parts[parts.length-1];
+    const newPath = path+'.'+ext;
+    fs.renameSync(path, newPath);
+
+    const {title,summary,content} = req.body;
+    const postDoc = await Post.create({
+        title,
+        summary,
+        content,
+        cover:newPath,
+    });
+
+    res.json(postDoc);
+});
+
+
+
 //sets the app to listen to 4000 server
 app.listen(4000);
 
@@ -81,29 +105,3 @@ app.listen(4000);
 // mongodb+srv://iblog:NeiCmE4zcQH48Ayf@cluster0.mdggqin.mongodb.net/?retryWrites=true&w=majority
 
 
-/*
-s
-app.post('/login', async (req,res) => {
-    const {username,password} = req.body;
-    const userDoc = await User.findOne({username});
-    const passOk = bcrypt.compareSync(password, userDoc.password);
-    if(passOk){
-        jwt.sign({username,id:userDoc._id}, secret, {}, (err,token) => {
-            if (err) throw err;
-            res.json(token);
-        });
-    }else{
-        res.status(400).json('wrong credentials');
-    }
-});
-
-app.post('/login', async (req,res) => {
-    const {username,password} = req.body;
-    const userDoc = await User.findOne({username});
-    const passOk = bcrypt.compareSync(password, userDoc.password);
-    res.json(passOk);
-});
-
-
-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InF3ZXIiLCJpZCI6IjY0MzNhYmE4ZDg2NTNjOWU4Njk5MjFkOCIsImlhdCI6MTY4MTExMjExMH0.CKjSXI8XcE_UVp4tQIwALixmFw1iaBDT2-3dMQf8SIQ; Path=/
-*/
